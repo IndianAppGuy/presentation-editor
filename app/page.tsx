@@ -2,16 +2,17 @@
 
 import Editor from "@/components/editor/Editor"
 import { usePresentation } from "@/lib/store/presentation"
+import { Presentation, SlideTemplate } from "@/lib/types"
 import { useEffect } from "react"
 
 // Sample data for testing
-const SAMPLE_PRESENTATION = {
+const SAMPLE_PRESENTATION: Presentation = {
   id: "1",
   title: "Sample Presentation",
   slides: [
     {
       id: "1",
-      template: "default",
+      template: "default" as SlideTemplate,
       title: "Welcome to the Presentation",
       subtitle: "A Sample Slide Deck",
       bodyContent: [
@@ -23,7 +24,7 @@ const SAMPLE_PRESENTATION = {
     },
     {
       id: "2",
-      template: "default",
+      template: "default" as SlideTemplate,
       title: "Second Slide",
       bodyContent: ["Point 1", "Point 2", "Point 3"]
     }

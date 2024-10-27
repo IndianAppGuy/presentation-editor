@@ -1,7 +1,11 @@
 "use client"
 
 import { usePresentation } from "@/lib/store/presentation"
-import { Presentation } from "@/lib/types"
+import {
+  ImportedPresentation,
+  Slide,
+  validateImportedPresentation
+} from "@/lib/types"
 import { Plus, Upload } from "lucide-react"
 import React, { useRef } from "react"
 
@@ -15,9 +19,9 @@ export default function Sidebar() {
   const handleAddSlide = () => {
     if (!presentation) return
 
-    const newSlide = {
-      id: `slide_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Ensure unique ID
-      template: "default" as const,
+    const newSlide: Slide = {
+      id: `slide_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      template: "default",
       title: "New Slide",
       bodyContent: ["Add your content here"]
     }
@@ -37,22 +41,8 @@ export default function Sidebar() {
 
     try {
       const text = await file.text()
-      const jsonData = JSON.parse(text)
-
-      // Ensure each slide has a unique ID
-      const validatedData: Presentation = {
-        ...jsonData,
-        id: jsonData.id || `pres_${Date.now()}`,
-        createdAt: new Date(jsonData.createdAt || Date.now()),
-        updatedAt: new Date(jsonData.updatedAt || Date.now()),
-        slides: jsonData.slides.map((slide: any) => ({
-          ...slide,
-          id: `slide_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          template: slide.template || "default",
-          bodyContent: Array.isArray(slide.bodyContent) ? slide.bodyContent : []
-        }))
-      }
-
+      const jsonData = JSON.parse(text) as ImportedPresentation
+      const validatedData = validateImportedPresentation(jsonData)
       setPresentation(validatedData)
     } catch (error) {
       console.error("Error importing JSON:", error)
@@ -85,7 +75,6 @@ export default function Sidebar() {
           className="hidden"
           onChange={handleFileImport}
           onClick={(e) => {
-            // Reset file input
             ;(e.target as HTMLInputElement).value = ""
           }}
         />
@@ -94,7 +83,7 @@ export default function Sidebar() {
       <div className="flex-1 overflow-y-auto p-2 space-y-2">
         {presentation.slides.map((slide, index) => (
           <div
-            key={slide.id} // Using unique slide ID
+            key={slide.id}
             className={`
               p-3 rounded-lg cursor-pointer
               ${
