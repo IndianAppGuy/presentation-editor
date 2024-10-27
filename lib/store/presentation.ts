@@ -1,15 +1,15 @@
 import { create } from "zustand"
-import { PresentationStore } from "../types"
+import { Presentation, PresentationStore, SlideUpdates } from "../types"
 
 export const usePresentation = create<PresentationStore>((set) => ({
   presentation: null,
   currentSlideIndex: 0,
 
-  setPresentation: (presentation) => set({ presentation }),
+  setPresentation: (presentation: Presentation) => set({ presentation }),
 
-  setCurrentSlide: (index) => set({ currentSlideIndex: index }),
+  setCurrentSlide: (index: number) => set({ currentSlideIndex: index }),
 
-  updateSlide: (slideId, updates) =>
+  updateSlide: (slideId: string, updates: Partial<SlideUpdates>) =>
     set((state) => {
       if (!state.presentation) return state
 
