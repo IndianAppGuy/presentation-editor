@@ -56,6 +56,7 @@ export default function Canvas() {
     const updates: SlideUpdates = {}
 
     if (field === "bodyContent" && typeof index === "number") {
+      // Create a new array with the updated content
       const newContent = [...currentSlide.bodyContent]
       newContent[index] = value
       updates.bodyContent = newContent
@@ -63,6 +64,7 @@ export default function Canvas() {
       updates[field] = value
     }
 
+    // Pass the slide ID to ensure we're updating the correct slide
     updateSlide(currentSlide.id, updates)
   }
 

@@ -13,10 +13,25 @@ export const usePresentation = create<PresentationStore>((set) => ({
     set((state) => {
       if (!state.presentation) return state
 
-      const slides = state.presentation.slides.map((slide) =>
-        slide.id === slideId ? { ...slide, ...updates } : slide
-      )
+      // Create new slides array with the update
+      const slides = state.presentation.slides.map((slide) => {
+        if (slide.id === slideId) {
+          // For bodyContent, ensure we're creating a new array
+          const updatedSlide = { ...slide }
 
+          if (updates.bodyContent) {
+            updatedSlide.bodyContent = [...updates.bodyContent]
+          }
+
+          return {
+            ...updatedSlide,
+            ...updates
+          }
+        }
+        return slide
+      })
+
+      // Create new presentation object
       return {
         presentation: {
           ...state.presentation,

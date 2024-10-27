@@ -1,30 +1,106 @@
-import React from 'react';
-import { usePresentation } from '@/lib/store/presentation';
-import { Plus } from 'lucide-react';
+"use client"
+
+import { usePresentation } from "@/lib/store/presentation"
+import { Presentation } from "@/lib/types"
+import { Plus, Upload } from "lucide-react"
+import React, { useRef } from "react"
 
 export default function Sidebar() {
-  const { presentation, currentSlideIndex, setCurrentSlide } = usePresentation();
-  
-  if (!presentation) return null;
+  const { presentation, currentSlideIndex, setCurrentSlide, setPresentation } =
+    usePresentation()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  if (!presentation) return null
+
+  const handleAddSlide = () => {
+    if (!presentation) return
+
+    const newSlide = {
+      id: `slide_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Ensure unique ID
+      template: "default" as const,
+      title: "New Slide",
+      bodyContent: ["Add your content here"]
+    }
+
+    setPresentation({
+      ...presentation,
+      slides: [...presentation.slides, newSlide],
+      updatedAt: new Date()
+    })
+  }
+
+  const handleFileImport = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    try {
+      const text = await file.text()
+      const jsonData = JSON.parse(text)
+
+      // Ensure each slide has a unique ID
+      const validatedData: Presentation = {
+        ...jsonData,
+        id: jsonData.id || `pres_${Date.now()}`,
+        createdAt: new Date(jsonData.createdAt || Date.now()),
+        updatedAt: new Date(jsonData.updatedAt || Date.now()),
+        slides: jsonData.slides.map((slide: any) => ({
+          ...slide,
+          id: `slide_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          template: slide.template || "default",
+          bodyContent: Array.isArray(slide.bodyContent) ? slide.bodyContent : []
+        }))
+      }
+
+      setPresentation(validatedData)
+    } catch (error) {
+      console.error("Error importing JSON:", error)
+      alert("Invalid JSON format. Please check your file.")
+    }
+  }
 
   return (
     <div className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col">
-      <div className="p-4 border-b border-gray-200">
-        <button className="w-full flex items-center justify-center space-x-2 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+      <div className="p-4 border-b border-gray-200 space-y-2">
+        <button
+          onClick={handleAddSlide}
+          className="w-full flex items-center justify-center space-x-2 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+        >
           <Plus className="w-4 h-4" />
           <span>Add Slide</span>
         </button>
+
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="w-full flex items-center justify-center space-x-2 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+        >
+          <Upload className="w-4 h-4" />
+          <span>Import JSON</span>
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          className="hidden"
+          onChange={handleFileImport}
+          onClick={(e) => {
+            // Reset file input
+            ;(e.target as HTMLInputElement).value = ""
+          }}
+        />
       </div>
-      
+
       <div className="flex-1 overflow-y-auto p-2 space-y-2">
         {presentation.slides.map((slide, index) => (
           <div
-            key={slide.id}
+            key={slide.id} // Using unique slide ID
             className={`
               p-3 rounded-lg cursor-pointer
-              ${currentSlideIndex === index 
-                ? 'bg-blue-100 border-2 border-blue-500' 
-                : 'hover:bg-gray-100 border-2 border-transparent'
+              ${
+                currentSlideIndex === index
+                  ? "bg-blue-100 border-2 border-blue-500"
+                  : "hover:bg-gray-100 border-2 border-transparent"
               }
             `}
             onClick={() => setCurrentSlide(index)}
@@ -35,5 +111,5 @@ export default function Sidebar() {
         ))}
       </div>
     </div>
-  );
+  )
 }
