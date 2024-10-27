@@ -1,18 +1,10 @@
 "use client"
 
+import { TemplateProps } from "@/lib/types/templates"
 import { Pencil } from "lucide-react"
 import React, { useState } from "react"
 
-interface Template1Props {
-  slide: {
-    title: string
-    subtitle?: string
-    bodyContent: string[]
-  }
-  onEdit: (field: string, value: string, index?: number) => void
-}
-
-const Template1: React.FC<Template1Props> = ({ slide, onEdit }) => {
+const Template1: React.FC<TemplateProps> = ({ slide, onEdit }) => {
   const [hoveredElement, setHoveredElement] = useState<string | null>(null)
 
   return (

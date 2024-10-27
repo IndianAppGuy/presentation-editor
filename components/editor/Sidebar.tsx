@@ -23,7 +23,11 @@ export default function Sidebar() {
       id: `slide_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       template: "default",
       title: "New Slide",
-      bodyContent: ["Add your content here"]
+      bodyContent: ["Add your content here"],
+      theme: {
+        background: "bg-gradient-to-r from-gray-900 to-gray-800",
+        textColor: "text-white"
+      }
     }
 
     setPresentation({

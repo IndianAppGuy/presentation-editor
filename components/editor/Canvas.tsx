@@ -1,83 +1,99 @@
 "use client"
 
+import { getTemplate } from "@/components/templates"
 import { usePresentation } from "@/lib/store/presentation"
-import type { Slide, SlideUpdates } from "@/lib/types"
-import React from "react"
-import EditableText from "./EditableText"
-
-const SlideContent: React.FC<{
-  slide: Slide
-  onEdit: (field: keyof SlideUpdates, value: string, index?: number) => void
-}> = ({ slide, onEdit }) => {
-  return (
-    <div className="flex flex-col items-start justify-start h-full p-16">
-      {/* Title */}
-      <EditableText
-        content={slide.title}
-        onEdit={(newValue) => onEdit("title", newValue)}
-        isTitle
-      />
-
-      {/* Subtitle if exists */}
-      {slide.subtitle && (
-        <EditableText
-          content={slide.subtitle}
-          onEdit={(newValue) => onEdit("subtitle", newValue)}
-          className="mt-4"
-        />
-      )}
-
-      {/* Body Content */}
-      <div className="mt-8 space-y-4 w-full">
-        {slide.bodyContent.map((content, index) => (
-          <EditableText
-            key={index}
-            content={content}
-            onEdit={(newValue) => onEdit("bodyContent", newValue, index)}
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
+import type { SlideImage, SlideTemplate, SlideUpdates } from "@/lib/types"
+import { useState } from "react"
+import { ImageUploader } from "../ui/ImageUploader"
+import { TemplateSelector } from "../ui/TemplateSelector"
 
 export default function Canvas() {
-  const { presentation, currentSlideIndex, updateSlide } = usePresentation()
+  const { presentation, currentSlideIndex, updateSlide, updateSlideTemplate } =
+    usePresentation()
+  const [showImageUploader, setShowImageUploader] = useState(false)
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false)
 
   if (!presentation) return null
 
   const currentSlide = presentation.slides[currentSlideIndex]
+  const TemplateComponent = getTemplate(currentSlide.template)
 
   const handleEdit = (
     field: keyof SlideUpdates,
-    value: string,
+    value: string | SlideImage,
     index?: number
   ) => {
-    const updates: SlideUpdates = {}
+    const updates: Partial<SlideUpdates> = {}
 
-    if (field === "bodyContent" && typeof index === "number") {
-      // Create a new array with the updated content
+    if (
+      field === "bodyContent" &&
+      typeof index === "number" &&
+      typeof value === "string"
+    ) {
       const newContent = [...currentSlide.bodyContent]
       newContent[index] = value
       updates.bodyContent = newContent
+    } else if (field === "image" && typeof value === "object") {
+      updates.image = value as SlideImage
     } else if (field === "title" || field === "subtitle") {
-      updates[field] = value
+      updates[field] = value as string
     }
 
-    // Pass the slide ID to ensure we're updating the correct slide
     updateSlide(currentSlide.id, updates)
+  }
+
+  const handleTemplateSelect = (template: SlideTemplate) => {
+    updateSlideTemplate(currentSlide.id, template)
+    setShowTemplateSelector(false)
+  }
+
+  const handleImageUpload = (imageUrl: string) => {
+    const imageData: SlideImage = {
+      url: imageUrl,
+      position: "center",
+      size: "medium"
+    }
+    handleEdit("image", imageData)
+    setShowImageUploader(false)
   }
 
   return (
     <div className="flex-1 bg-gray-100 p-8 overflow-auto">
       <div className="max-w-5xl mx-auto">
+        <div className="mb-4 flex justify-end space-x-2">
+          <button
+            onClick={() => setShowTemplateSelector(true)}
+            className="px-4 py-2 bg-white border rounded-md hover:bg-gray-50"
+          >
+            Change Template
+          </button>
+        </div>
+
         <div
-          className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-lg"
+          className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-lg overflow-hidden"
           style={{ aspectRatio: "16/9" }}
         >
-          <SlideContent slide={currentSlide} onEdit={handleEdit} />
+          <TemplateComponent
+            slide={currentSlide}
+            onEdit={handleEdit}
+            onImageUpload={() => setShowImageUploader(true)}
+          />
         </div>
       </div>
+
+      {showTemplateSelector && (
+        <TemplateSelector
+          onSelectAction={handleTemplateSelect}
+          onCloseAction={() => setShowTemplateSelector(false)}
+        />
+      )}
+
+      {showImageUploader && (
+        <ImageUploader
+          onUploadAction={handleImageUpload}
+          onCloseAction={() => setShowImageUploader(false)}
+        />
+      )}
     </div>
   )
 }

@@ -78,10 +78,10 @@ export default function Toolbar() {
         }
 
         // Add image if exists
-        if (slide.imageUrl) {
+        if (slide.image?.url || slide.imageUrl) {
           try {
             pptxSlide.addImage({
-              path: slide.imageUrl,
+              path: slide.image?.url || (slide.imageUrl as string),
               x: 6,
               y: 1,
               w: 3,
