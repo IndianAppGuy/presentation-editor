@@ -1,3 +1,4 @@
+// app/page.tsx
 "use client"
 
 import Editor from "@/components/editor/Editor"

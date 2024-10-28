@@ -1,3 +1,4 @@
+// components/editor/Canvas.tsx
 "use client"
 
 import { getTemplate } from "@/components/templates"
