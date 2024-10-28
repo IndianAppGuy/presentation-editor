@@ -53,10 +53,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     imgElement.src = imageUrl
   }
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
+  const processFile = (file: File) => {
     setError("")
 
     // Validate file type
@@ -74,17 +71,46 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     setIsLoading(true)
 
     try {
-      // For now, using placeholder API
-      // In production, implement proper file upload
-      const placeholderUrl = `/api/placeholder/${Math.round(
-        Math.random() * 1000
-      )}/${Math.round(Math.random() * 1000)}`
-      onUploadAction(placeholderUrl)
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          // Convert the file to a data URL
+          const dataUrl = event.target.result as string
+          onUploadAction(dataUrl)
+        }
+      }
+      reader.onerror = () => {
+        setError("Error reading file")
+      }
+      reader.readAsDataURL(file)
     } catch (err) {
       setError("Error uploading image")
       console.error("Upload error:", err)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      processFile(file)
+    }
+  }
+
+  // Handle drag and drop
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const file = e.dataTransfer.files[0]
+    if (file) {
+      processFile(file)
     }
   }
 
@@ -135,18 +161,20 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           <div
             className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50"
             onClick={() => fileInputRef.current?.click()}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
           >
             <Upload className="w-8 h-8 text-gray-400 mb-2" />
             <p className="text-sm text-gray-600">
               Click to upload or drag and drop
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              PNG, JPG, GIF up to 10MB
+              PNG, JPG, GIF up to {maxSize}MB
             </p>
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept={allowedTypes.join(",")}
               onChange={handleFileUpload}
               className="hidden"
             />
