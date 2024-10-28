@@ -2,7 +2,7 @@
 
 import { usePresentation } from "@/lib/store/presentation"
 import {
-  ImportedPresentation,
+  CustomPresentation,
   Slide,
   validateImportedPresentation
 } from "@/lib/types"
@@ -45,7 +45,9 @@ export default function Sidebar() {
 
     try {
       const text = await file.text()
-      const jsonData = JSON.parse(text) as ImportedPresentation
+      const jsonData = JSON.parse(text) as CustomPresentation
+
+      // Validate and set the presentation
       const validatedData = validateImportedPresentation(jsonData)
       setPresentation(validatedData)
     } catch (error) {
@@ -54,8 +56,35 @@ export default function Sidebar() {
     }
   }
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const file = e.dataTransfer.files[0]
+    if (file && file.type === "application/json") {
+      try {
+        const text = await file.text()
+        const jsonData = JSON.parse(text) as CustomPresentation
+        const validatedData = validateImportedPresentation(jsonData)
+        setPresentation(validatedData)
+      } catch (error) {
+        console.error("Error importing JSON:", error)
+        alert("Invalid JSON format. Please check your file.")
+      }
+    }
+  }
+
   return (
-    <div className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col">
+    <div
+      className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
       <div className="p-4 border-b border-gray-200 space-y-2">
         <button
           onClick={handleAddSlide}
@@ -99,7 +128,12 @@ export default function Sidebar() {
             onClick={() => setCurrentSlide(index)}
           >
             <div className="text-sm font-medium truncate">{slide.title}</div>
-            <div className="text-xs text-gray-500">Slide {index + 1}</div>
+            <div className="text-xs text-gray-500">
+              Slide {index + 1}
+              {slide.template !== "default" && (
+                <span className="ml-2 text-blue-500">• {slide.template}</span>
+              )}
+            </div>
           </div>
         ))}
       </div>

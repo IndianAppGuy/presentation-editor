@@ -19,6 +19,20 @@ export interface SlideImage {
   backgroundOverlay?: boolean
 }
 
+export interface CustomSlide {
+  title: string
+  subtitle?: string
+  bodyContent: string[]
+  imageSearch?: string
+  template?: SlideTemplate
+}
+
+export interface CustomPresentation {
+  presentationTitle?: string
+  title?: string
+  slides?: CustomSlide[]
+}
+
 export interface SlideTheme {
   background?: string
   textColor?: string
@@ -84,44 +98,113 @@ export interface ImportedPresentation {
   updatedAt?: string | number | Date
 }
 
+// Type guard functions
+const isCustomSlide = (
+  slide: ImportedSlide | CustomSlide
+): slide is CustomSlide => {
+  return "imageSearch" in slide
+}
+
+const isImportedSlide = (
+  slide: ImportedSlide | CustomSlide
+): slide is ImportedSlide => {
+  return "imageUrl" in slide || "image" in slide
+}
+
 // Validation functions
-export const validateImportedSlide = (slide: ImportedSlide): Slide => {
+export const validateImportedSlide = (
+  slide: ImportedSlide | CustomSlide
+): Slide => {
+  // Determine template based on content
+  let template: SlideTemplate = "default"
+
+  // Determine if the slide has an image based on slide type
+  let hasImage = false
+
+  if (isCustomSlide(slide)) {
+    hasImage = !!slide.imageSearch
+  } else if (isImportedSlide(slide)) {
+    hasImage = !!(slide.image?.url || slide.imageUrl)
+  }
+
+  if (hasImage) {
+    template = "image-right"
+  }
+
   const validatedSlide: Slide = {
     id:
-      slide.id ||
+      ("id" in slide && slide.id) ||
       `slide_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    template: (slide.template as SlideTemplate) || "default",
+    template: (slide.template as SlideTemplate) || template,
     title: slide.title || "Untitled Slide",
     bodyContent: Array.isArray(slide.bodyContent)
       ? slide.bodyContent
       : ["Add content here"]
   }
 
-  if (slide.image) {
-    validatedSlide.image = slide.image
-  } else if (slide.imageUrl) {
+  // Handle image data based on slide type
+  if (isCustomSlide(slide) && slide.imageSearch) {
     validatedSlide.image = {
-      url: slide.imageUrl,
-      position: "center",
+      url: slide.imageSearch,
+      position: "right",
       size: "medium"
     }
-    validatedSlide.imageUrl = slide.imageUrl
+  } else if (isImportedSlide(slide)) {
+    if (slide.image) {
+      validatedSlide.image = {
+        url: slide.image.url,
+        position: slide.image.position || "right",
+        size: slide.image.size || "medium",
+        alt: slide.image.alt,
+        backgroundOverlay: slide.image.backgroundOverlay
+      }
+    } else if (slide.imageUrl) {
+      validatedSlide.image = {
+        url: slide.imageUrl,
+        position: "right",
+        size: "medium"
+      }
+    }
   }
 
-  if (slide.subtitle) validatedSlide.subtitle = slide.subtitle
-  if (slide.theme) validatedSlide.theme = slide.theme
+  if (slide.subtitle) {
+    validatedSlide.subtitle = slide.subtitle
+  }
+
+  // Set appropriate theme based on template
+  validatedSlide.theme =
+    "theme" in slide && slide.theme
+      ? slide.theme
+      : {
+          background: "bg-gradient-to-r from-gray-900 to-gray-800",
+          textColor: "text-white"
+        }
 
   return validatedSlide
 }
 
 export const validateImportedPresentation = (
-  jsonData: ImportedPresentation
-): Presentation => ({
-  id: jsonData.id || `pres_${Date.now()}`,
-  title: jsonData.title || "Untitled Presentation",
-  slides: Array.isArray(jsonData.slides)
+  jsonData: ImportedPresentation | CustomPresentation
+): Presentation => {
+  // Handle both standard and custom presentation formats
+  const title =
+    "presentationTitle" in jsonData
+      ? jsonData.presentationTitle || jsonData.title || "Untitled Presentation"
+      : jsonData.title || "Untitled Presentation"
+
+  const validatedSlides = Array.isArray(jsonData.slides)
     ? jsonData.slides.map(validateImportedSlide)
-    : [],
-  createdAt: new Date(jsonData.createdAt || Date.now()),
-  updatedAt: new Date(jsonData.updatedAt || Date.now())
-})
+    : []
+
+  return {
+    id: ("id" in jsonData && jsonData.id) || `pres_${Date.now()}`,
+    title,
+    slides: validatedSlides,
+    createdAt: new Date(
+      ("createdAt" in jsonData && jsonData.createdAt) || Date.now()
+    ),
+    updatedAt: new Date(
+      ("updatedAt" in jsonData && jsonData.updatedAt) || Date.now()
+    )
+  }
+}
