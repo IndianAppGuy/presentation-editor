@@ -3,6 +3,7 @@ import {
   SlideImage,
   SlideTemplate,
   SlideTheme,
+  SlideUpdates,
   TemplateCategory
 } from "./index"
 
@@ -23,7 +24,12 @@ export interface TemplateConfig {
 
 export interface TemplateProps {
   slide: Slide
-  onEdit: (field: string, value: string | SlideImage, index?: number) => void
+  onEdit: (
+    field: keyof SlideUpdates,
+    value: string | SlideImage,
+    index?: number
+  ) => void
+  onImageUpload?: () => void
   theme?: SlideTheme
 }
 

@@ -47,16 +47,6 @@ export default function Canvas() {
     setShowTemplateSelector(false)
   }
 
-  const handleImageUpload = (imageUrl: string) => {
-    const imageData: SlideImage = {
-      url: imageUrl,
-      position: "center",
-      size: "medium"
-    }
-    handleEdit("image", imageData)
-    setShowImageUploader(false)
-  }
-
   return (
     <div className="flex-1 bg-gray-100 p-8 overflow-auto">
       <div className="max-w-5xl mx-auto">
@@ -77,6 +67,7 @@ export default function Canvas() {
             slide={currentSlide}
             onEdit={handleEdit}
             onImageUpload={() => setShowImageUploader(true)}
+            theme={currentSlide.theme}
           />
         </div>
       </div>
@@ -90,7 +81,14 @@ export default function Canvas() {
 
       {showImageUploader && (
         <ImageUploader
-          onUploadAction={handleImageUpload}
+          onUploadAction={(imageUrl) => {
+            handleEdit("image", {
+              url: imageUrl,
+              position: "center",
+              size: "medium"
+            })
+            setShowImageUploader(false)
+          }}
           onCloseAction={() => setShowImageUploader(false)}
         />
       )}
