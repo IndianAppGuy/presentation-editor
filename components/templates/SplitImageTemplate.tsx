@@ -1,12 +1,15 @@
-"use client"
-
 import { TemplateProps } from "@/lib/types/templates"
 import { ImagePlus, Pencil } from "lucide-react"
 import React, { useState } from "react"
 import EditableText from "../editor/EditableText"
 import { ImageUploader } from "../ui/ImageUploader"
+import { PreviewContent, PreviewImage, PreviewText } from "./BaseTemplate"
 
-const SplitImageTemplate: React.FC<TemplateProps> = ({ slide, onEdit }) => {
+const SplitImageTemplate: React.FC<TemplateProps> = ({
+  slide,
+  onEdit,
+  isPreview = false
+}) => {
   const [showImageUploader, setShowImageUploader] = useState(false)
 
   const handleImageUpload = (imageUrl: string) => {
@@ -14,6 +17,43 @@ const SplitImageTemplate: React.FC<TemplateProps> = ({ slide, onEdit }) => {
     setShowImageUploader(false)
   }
 
+  // Preview Mode
+  if (isPreview) {
+    return (
+      <div className="w-full h-full overflow-hidden">
+        {/* Title Bar Preview */}
+        <div className="w-full bg-gray-900 p-3">
+          <PreviewText
+            content={slide.title}
+            className="text-lg font-bold text-white text-center"
+          />
+          {slide.subtitle && (
+            <PreviewText
+              content={slide.subtitle}
+              className="text-xs text-white/80 text-center mt-1"
+            />
+          )}
+        </div>
+
+        {/* Split Content Preview */}
+        <div className="flex h-[calc(100%-3.75rem)]">
+          <div className="w-1/2 bg-gray-800">
+            {slide.image && (
+              <PreviewImage url={slide.image.url} className="w-full h-full" />
+            )}
+          </div>
+          <div className="w-1/2 bg-gradient-to-r from-gray-900 to-gray-800 p-3">
+            <PreviewContent
+              content={slide.bodyContent}
+              className="text-white/90"
+            />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Edit Mode
   return (
     <div className="w-full h-full">
       {/* Title Bar */}

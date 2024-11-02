@@ -31,6 +31,7 @@ export interface TemplateProps {
   ) => void
   onImageUpload?: () => void
   theme?: SlideTheme
+  isPreview?: boolean
 }
 
 // Template utility functions

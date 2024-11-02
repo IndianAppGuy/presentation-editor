@@ -1,12 +1,15 @@
-"use client"
-
 import { TemplateProps } from "@/lib/types/templates"
 import { ImagePlus, Pencil } from "lucide-react"
 import React, { useState } from "react"
 import EditableText from "../editor/EditableText"
 import { ImageUploader } from "../ui/ImageUploader"
+import { PreviewContent, PreviewImage, PreviewText } from "./BaseTemplate"
 
-const ImageLeftTemplate: React.FC<TemplateProps> = ({ slide, onEdit }) => {
+const ImageLeftTemplate: React.FC<TemplateProps> = ({
+  slide,
+  onEdit,
+  isPreview = false
+}) => {
   const [showImageUploader, setShowImageUploader] = useState(false)
 
   const handleImageUpload = (imageUrl: string) => {
@@ -14,6 +17,36 @@ const ImageLeftTemplate: React.FC<TemplateProps> = ({ slide, onEdit }) => {
     setShowImageUploader(false)
   }
 
+  // Preview Mode
+  if (isPreview) {
+    return (
+      <div className="w-full h-full flex overflow-hidden">
+        <div className="w-[40%] bg-gray-800">
+          {slide.image && (
+            <PreviewImage url={slide.image.url} className="w-full h-full" />
+          )}
+        </div>
+        <div className="flex-1 bg-gradient-to-r from-gray-900 to-gray-800 p-4">
+          <PreviewText
+            content={slide.title}
+            className="text-xl font-bold text-white mb-2"
+          />
+          {slide.subtitle && (
+            <PreviewText
+              content={slide.subtitle}
+              className="text-sm text-white/80 mb-3"
+            />
+          )}
+          <PreviewContent
+            content={slide.bodyContent}
+            className="text-white/90"
+          />
+        </div>
+      </div>
+    )
+  }
+
+  // Edit Mode
   return (
     <div className="w-full h-full flex">
       {/* Image Section (Left) */}
@@ -53,7 +86,6 @@ const ImageLeftTemplate: React.FC<TemplateProps> = ({ slide, onEdit }) => {
 
       {/* Content Section (Right) */}
       <div className="flex-1 bg-gradient-to-r from-gray-900 to-gray-800 p-8">
-        {/* Title Section */}
         <EditableText
           content={slide.title}
           onEdit={(newValue) => onEdit("title", newValue)}
@@ -61,7 +93,6 @@ const ImageLeftTemplate: React.FC<TemplateProps> = ({ slide, onEdit }) => {
           className="mb-4"
         />
 
-        {/* Subtitle Section */}
         {slide.subtitle && (
           <EditableText
             content={slide.subtitle}
@@ -70,7 +101,6 @@ const ImageLeftTemplate: React.FC<TemplateProps> = ({ slide, onEdit }) => {
           />
         )}
 
-        {/* Content Section */}
         <div className="space-y-4">
           {slide.bodyContent.map((content, index) => (
             <EditableText
