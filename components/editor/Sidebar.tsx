@@ -143,9 +143,9 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="w-80 bg-gray-50 border-r border-gray-200 flex flex-col">
+    <div className="w-80 bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden">
       {/* Header Section */}
-      <div className="p-4 border-b border-gray-200 bg-white">
+      <div className="p-4 border-b border-gray-200 bg-white flex-shrink-0">
         <h2 className="text-sm font-medium text-gray-700 mb-4">Slides</h2>
 
         <div className="space-y-2">
@@ -182,7 +182,7 @@ export default function Sidebar() {
 
       {/* Slides List */}
       <div
-        className="flex-1 overflow-y-auto p-4 space-y-4"
+        className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0"
         onDragOver={handleDragOver}
       >
         {presentation.slides.map((slide, index) => (

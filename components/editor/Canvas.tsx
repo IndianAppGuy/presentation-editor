@@ -49,7 +49,7 @@ export default function Canvas() {
   }
 
   return (
-    <div className="flex-1 bg-gray-100 p-8 overflow-auto">
+    <div className="flex-1 bg-gray-100 p-8">
       <div className="max-w-5xl mx-auto">
         <div className="mb-4 flex justify-end space-x-2">
           <button
