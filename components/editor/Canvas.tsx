@@ -49,8 +49,8 @@ export default function Canvas() {
   }
 
   return (
-    <div className="flex-1 bg-gray-100 p-8">
-      <div className="max-w-5xl mx-auto">
+    <div className="flex-1 bg-gray-100 p-8 flex items-center justify-center overflow-hidden">
+      <div className="w-full max-w-7xl mx-auto flex flex-col">
         <div className="mb-4 flex justify-end space-x-2">
           <button
             onClick={() => setShowTemplateSelector(true)}
@@ -60,16 +60,17 @@ export default function Canvas() {
           </button>
         </div>
 
-        <div
-          className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-lg overflow-hidden"
-          style={{ aspectRatio: "16/9" }}
-        >
-          <TemplateComponent
-            slide={currentSlide}
-            onEdit={handleEdit}
-            onImageUpload={() => setShowImageUploader(true)}
-            theme={currentSlide.theme}
-          />
+        <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+          <div className="absolute inset-0">
+            <div className="w-full h-full bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-lg overflow-hidden">
+              <TemplateComponent
+                slide={currentSlide}
+                onEdit={handleEdit}
+                onImageUpload={() => setShowImageUploader(true)}
+                theme={currentSlide.theme}
+              />
+            </div>
+          </div>
         </div>
       </div>
 

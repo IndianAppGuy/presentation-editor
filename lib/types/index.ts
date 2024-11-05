@@ -1,6 +1,9 @@
 // Core types that are used throughout the application
 export type SlideTemplate =
   | "default"
+  | "hero"
+  | "table-of-contents"
+  | "grid-content"
   | "image-right"
   | "image-left"
   | "full-image"

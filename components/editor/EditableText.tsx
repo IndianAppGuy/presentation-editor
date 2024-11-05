@@ -1,7 +1,14 @@
 "use client"
 
 import { Pencil } from "lucide-react"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useState } from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog"
 
 export interface EditableTextProps {
   content: string
@@ -17,99 +24,36 @@ const EditableText: React.FC<EditableTextProps> = ({
   isTitle = false
 }) => {
   const [isHovered, setIsHovered] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editValue, setEditValue] = useState(content)
-  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    setEditValue(content)
-  }, [content])
-
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus()
-      inputRef.current.select()
-    }
-  }, [isEditing])
-
-  const handleSave = useCallback(() => {
+  const handleSave = () => {
     if (editValue !== content) {
       onEdit(editValue)
     }
-    setIsEditing(false)
-  }, [editValue, content, onEdit])
+    setIsDialogOpen(false)
+  }
 
-  // Handle click outside to save
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        handleSave()
-      }
-    }
-
-    if (isEditing) {
-      document.addEventListener("mousedown", handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [isEditing, handleSave])
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      handleSave()
-    }
-    if (e.key === "Escape") {
-      setIsEditing(false)
-      setEditValue(content)
-    }
+  const handleOpen = () => {
+    setEditValue(content)
+    setIsDialogOpen(true)
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="group relative"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {isEditing ? (
-        // Edit mode
-        isTitle ? (
-          <input
-            ref={inputRef as React.RefObject<HTMLInputElement>}
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="w-full bg-white/10 text-4xl font-bold text-white rounded p-2 
-                     outline-none border border-blue-400 focus:border-blue-500"
-          />
-        ) : (
-          <textarea
-            ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            rows={1}
-            className="w-full bg-white/10 text-xl text-white/90 rounded p-2 
-                     outline-none border border-blue-400 focus:border-blue-500 
-                     resize-none overflow-hidden"
-            style={{ minHeight: "2.5rem" }}
-          />
-        )
-      ) : (
-        // Display mode
+    <>
+      <div
+        className="group relative"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <div
-          onClick={() => setIsEditing(true)}
+          onClick={handleOpen}
           className={`
-            cursor-text
-            ${isHovered ? "bg-white/10" : ""}
-            rounded p-2 transition-colors
+            cursor-pointer
+            rounded
+            transition-all
+            duration-200
+            ${isHovered ? "ring-2 ring-blue-500 ring-opacity-50" : ""}
             ${className}
           `}
         >
@@ -131,15 +75,45 @@ const EditableText: React.FC<EditableTextProps> = ({
               className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"
               onClick={(e) => {
                 e.stopPropagation()
-                setIsEditing(true)
+                handleOpen()
               }}
             >
               <Pencil className="w-4 h-4 text-white" />
             </button>
           </div>
         </div>
-      )}
-    </div>
+      </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit text</DialogTitle>
+          </DialogHeader>
+          <div className="p-4">
+            <textarea
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              className="w-full min-h-[100px] p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter your text..."
+            />
+          </div>
+          <DialogFooter className="flex justify-end gap-2 px-4 pb-4">
+            <button
+              onClick={() => setIsDialogOpen(false)}
+              className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+            >
+              Save
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 

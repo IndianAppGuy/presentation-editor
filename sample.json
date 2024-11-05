@@ -1,0 +1,40 @@
+{
+  "presentationTitle": "Revolutionary France",
+  "presentationSubtitle": "From Key Events to Napoleon's Rise",
+  "slides": [
+    {
+      "template": "hero",
+      "title": "Revolutionary France: From Key Events to Napoleon's Rise",
+      "subtitle": "A Journey Through the French Revolution and Its Aftermath",
+      "bodyContent": [],
+      "image": {
+        "url": "https://www.mrallsophistory.com/revision/wp-content/uploads/2014/01/Prise_de_la_Bastille.jpg",
+        "position": "right",
+        "size": "large"
+      }
+    },
+    {
+      "template": "table-of-contents",
+      "title": "TABLE OF CONTENTS",
+      "subtitle": "",
+      "bodyContent": [
+        "Key Events Leading to the French Revolution",
+        "Impact of the Estates-General",
+        "Execution of King Louis XVI",
+        "Reign of Terror",
+        "Rise of Napoleon Bonaparte"
+      ]
+    },
+    {
+      "template": "grid-content",
+      "title": "Impact of the Estates-General",
+      "subtitle": "Revolutionary France: From Key Events to Napoleon's Rise",
+      "bodyContent": [
+        "Convening after 175 years. The Estates-General was convened in 1789 after a hiatus of 175 years, allowing representatives from the three estates to come together.",
+        "Representation Disparity. The Third Estate, representing the commoners, had double the number of representatives compared to the First and Second Estates combined, highlighting social inequality.",
+        "Demand for Voting Reforms. Disagreements over voting procedures led to the Third Estate declaring itself the National Assembly, signaling a shift in power dynamics.",
+        "Tennis Court Oath. On June 20, 1789, members of the National Assembly took the Tennis Court Oath, pledging to not disband until a new constitution was established, showcasing unity and determination."
+      ]
+    }
+  ]
+}
