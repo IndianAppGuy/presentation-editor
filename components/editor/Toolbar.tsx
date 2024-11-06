@@ -217,33 +217,41 @@ export default function Toolbar() {
     )
   }
 
+  // Toolbar.tsx - update the main container and layout
   return (
-    <div className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4">
-      <div className="flex items-center space-x-4">
-        <h1 className="text-lg font-semibold">
-          {presentation?.title || "Untitled Presentation"}
-        </h1>
-      </div>
+    <div className="lg:sticky lg:top-0 z-10 flex min-h-20 shrink-0 justify-center border-b border-gray-200 bg-[#F8F9FC] lg:bg-white px-4 py-5 lg:px-6">
+      {/* Content container */}
+      <div className="flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
+        {/* Title section */}
+        <div className="flex items-center text-gray-600 text-sm">
+          <h1 className="font-semibold text-gray-900">
+            {presentation?.title || "Untitled Presentation"}
+          </h1>
+        </div>
 
-      <div className="flex items-center space-x-2">
-        <button
-          onClick={saveAsJson}
-          className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md 
+        {/* Actions section */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={saveAsJson}
+            className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm 
+                   font-semibold text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isExporting || !presentation}
+          >
+            <Save className="w-5 h-5" />
+            <span>Save</span>
+          </button>
+
+          <button
+            onClick={exportToPptx}
+            className="flex items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-600 px-3.5 py-2 
+                   text-sm font-semibold text-white shadow-sm hover:bg-blue-700 hover:border-blue-700 
                    disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={isExporting || !presentation}
-        >
-          <Save className="w-5 h-5" />
-          <span>Save</span>
-        </button>
-        <button
-          onClick={exportToPptx}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md 
-                   hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={isExporting || !presentation}
-        >
-          <Download className="w-5 h-5" />
-          <span>{isExporting ? "Exporting..." : "Export to PPTX"}</span>
-        </button>
+            disabled={isExporting || !presentation}
+          >
+            <Download className="w-5 h-5" />
+            <span>{isExporting ? "Exporting..." : "Export to PPTX"}</span>
+          </button>
+        </div>
       </div>
     </div>
   )

@@ -1,9 +1,9 @@
+// Editor.tsx
 "use client"
 
 import { usePresentation } from "@/lib/store/presentation"
 import dynamic from "next/dynamic"
 
-// Import components
 const Sidebar = dynamic(() => import("./Sidebar"), { ssr: false })
 const Canvas = dynamic(() => import("./Canvas"), { ssr: false })
 const Toolbar = dynamic(() => import("./Toolbar"), { ssr: false })
@@ -19,12 +19,17 @@ const Editor = () => {
     )
   }
 
+  // Editor.tsx
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col bg-[#F8F9FC]">
+      {" "}
+      {/* Using exact color value */}
       <Toolbar />
       <div className="flex-1 flex overflow-hidden">
         <Sidebar />
-        <Canvas />
+        <div className="relative flex h-full w-max grow justify-center overflow-y-auto overflow-x-hidden transition-opacity delay-150 sm:overflow-hidden opacity-100 bg-[#F8F9FC]">
+          <Canvas />
+        </div>
       </div>
     </div>
   )

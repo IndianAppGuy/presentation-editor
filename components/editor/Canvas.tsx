@@ -49,7 +49,8 @@ export default function Canvas() {
   }
 
   return (
-    <div className="flex-1 bg-gray-100 p-8 flex items-center justify-center overflow-hidden">
+    <div className="flex-1 bg-[#F8F9FC] p-8 flex items-center justify-center overflow-hidden">
+      {" "}
       <div className="w-full max-w-7xl mx-auto flex flex-col">
         <div className="mb-4 flex justify-end space-x-2">
           <button
@@ -73,14 +74,12 @@ export default function Canvas() {
           </div>
         </div>
       </div>
-
       {showTemplateSelector && (
         <TemplateSelector
           onSelectAction={handleTemplateSelect}
           onCloseAction={() => setShowTemplateSelector(false)}
         />
       )}
-
       {showImageUploader && (
         <ImageUploader
           onUploadAction={(imageUrl) => {
