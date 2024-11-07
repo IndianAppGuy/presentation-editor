@@ -42,24 +42,6 @@ export default function Sidebar() {
     setCurrentSlide(presentation.slides.length)
   }
 
-  const handleDeleteSlide = (index: number) => {
-    if (!presentation || presentation.slides.length <= 1) return
-
-    const newSlides = [...presentation.slides]
-    newSlides.splice(index, 1)
-
-    setPresentation({
-      ...presentation,
-      slides: newSlides,
-      updatedAt: new Date()
-    })
-
-    // Adjust current slide index if needed
-    if (currentSlideIndex >= index) {
-      setCurrentSlide(Math.max(0, currentSlideIndex - 1))
-    }
-  }
-
   const handleDragStart = (index: number) => {
     setDraggingSlideIndex(index)
   }
@@ -194,7 +176,6 @@ export default function Sidebar() {
               index={index}
               isActive={currentSlideIndex === index}
               onClick={() => setCurrentSlide(index)}
-              onDelete={() => handleDeleteSlide(index)}
               isDragging={draggingSlideIndex === index}
               dragHandleProps={{
                 draggable: true,
